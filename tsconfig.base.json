@@ -13,6 +13,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
+    "emitDecoratorMetadata": true,
     "importHelpers": true
   }
 }
