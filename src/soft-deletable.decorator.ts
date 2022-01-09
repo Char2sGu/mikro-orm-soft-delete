@@ -1,11 +1,9 @@
 import "./soft-deletable-handler.subscriber";
 
 import { Filter, FilterQuery } from "@mikro-orm/core";
-import { OperatorMap } from "@mikro-orm/core/dist/typings";
 
 import { SOFT_DELETABLE } from "./soft-deletable.symbol";
 import { SOFT_DELETABLE_FILTER } from "./soft-deletable-filter.constant";
-import { SoftDeletableFilterArgs } from "./soft-deletable-filter-args.interface";
 import { SoftDeletableHandlerSubscriber } from "./soft-deletable-handler.subscriber";
 import { SoftDeletableMetadata } from "./soft-deletable-metadata.interface";
 
@@ -29,12 +27,7 @@ export const SoftDeletable =
 
     Filter<Entity>({
       name: SOFT_DELETABLE_FILTER,
-      cond: ({ includeDeleted = false }: SoftDeletableFilterArgs = {}) =>
-        ({
-          [field]: includeDeleted
-            ? ({ $ne: null } as OperatorMap<Entity[Field]>)
-            : null,
-        } as FilterQuery<Entity>),
+      cond: { [field]: null } as FilterQuery<Entity>,
       default: true,
     })(type);
   };
