@@ -2,7 +2,7 @@
   "compilerOptions": {
     "composite": true,
     "target": "ES2020",
-    "module": "ES2020",
+    "module": "CommonJS",
     "lib": ["ES2020", "DOM", "DOM.Iterable", "ScriptHost"],
     "strict": true,
     "declaration": true,
