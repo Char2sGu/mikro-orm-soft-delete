@@ -16,7 +16,15 @@
     "type": "git",
     "url": "git+https://github.com/TheNightmareX/mikro-orm-soft-delete.git"
   },
-  "author": "",
+  "author": {
+    "name": "Char2s",
+    "email": "Char2s@outlook.com"
+  },
+  "keywords": [
+    "typescript",
+    "mikro-orm",
+    "soft-delete"
+  ],
   "license": "Apache-2.0",
   "bugs": {
     "url": "https://github.com/TheNightmareX/mikro-orm-soft-delete/issues"
