@@ -1,5 +1,5 @@
 {
-  "name": "library-ts-boilerplate",
+  "name": "mikro-orm-soft-delete",
   "version": "0.0.0",
   "description": "",
   "main": "lib/index.js",
@@ -14,14 +14,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/TheNightmareX/library-ts-boilerplate.git"
+    "url": "git+https://github.com/TheNightmareX/mikro-orm-soft-delete.git"
   },
   "author": "",
   "license": "Apache-2.0",
   "bugs": {
-    "url": "https://github.com/TheNightmareX/library-ts-boilerplate/issues"
+    "url": "https://github.com/TheNightmareX/mikro-orm-soft-delete/issues"
   },
-  "homepage": "https://github.com/TheNightmareX/library-ts-boilerplate#readme",
+  "homepage": "https://github.com/TheNightmareX/mikro-orm-soft-delete#readme",
   "devDependencies": {
     "@types/jest": "^27.0.3",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
