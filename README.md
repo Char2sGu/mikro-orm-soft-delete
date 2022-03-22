@@ -26,7 +26,7 @@ This means that:
 
 - A filter with conditions `{ deletedAt: null }` has been defined on `User` and enabled by default, so that those deleted entities will be filtered out by default. The filter can be disabled by:
   ```ts
-  repo.find({ ... }, { filters: { [SOFT_DELETABLE]: false } });
+  repo.find({ ... }, { filters: { [SOFT_DELETABLE_FILTER]: false } });
   repo.find({ ... }, { filters: false }); // if you are sure that there are no other filters enabled
   ```
 - When you try to delete a `User` entity, it will not be actually deleted from the database, and its `deletedAt` property will be set to a newly instantiated `Date`. You can find that `delete` statements are replaced with `update` ones with MikroORM's debug mode on.
