@@ -2,6 +2,10 @@
 
 Generic soft delete solution for MikroORM.
 
+```
+npm i mikro-orm-soft-delete
+```
+
 > Inspired by: https://github.com/mikro-orm/mikro-orm/issues/1492#issuecomment-785394397
 
 ## Tutorial
@@ -55,4 +59,4 @@ export abstract class SoftDeletableBaseEntity<
 
 ## Known Issues
 
-- https://github.com/mikro-orm/mikro-orm/issues/2440
+- [Deleted entities can appear in the query result in some cases](https://github.com/mikro-orm/mikro-orm/issues/2440)
