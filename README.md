@@ -57,6 +57,14 @@ export abstract class SoftDeletableBaseEntity<
 }
 ```
 
+### Hard Deleting
+
+Currently it's impossible to perform perfect hard deletes. As a workaround, we can hard delete entities using the native API:
+
+```ts
+em.nativeDelete(...);
+```
+
 ## Known Issues
 
 - [Deleted entities can appear in the query result in some cases](https://github.com/mikro-orm/mikro-orm/issues/2440)
