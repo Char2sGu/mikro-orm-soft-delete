@@ -12,6 +12,7 @@ import { SoftDeletableMetadata } from "./soft-deletable-metadata.interface";
  * @param type - Helper function for type inference.
  * @param field - Identifier field used to identify deleted entities.
  * @param value - Value to set to the identifier field in deletions.
+ * @param fieldValue - Value used to identify deleted entities. Defaults to `null`.
  * @returns
  * @see SoftDeletableHandlerSubscriber
  */
@@ -20,7 +21,7 @@ export const SoftDeletable =
     type: () => Type<Entity>,
     field: Field,
     value: () => Entity[Field],
-    fieldValue: any = null
+    fieldValue: any = null,
   ) =>
   (type: Type<Entity>): void => {
     const metadata: SoftDeletableMetadata<Entity, Field> = { field, value };

@@ -15,5 +15,6 @@
     "forceConsistentCasingInFileNames": true,
     "emitDecoratorMetadata": true,
     "importHelpers": true
-  }
+  },
+  "exclude": ["node_modules", "**/node_modules/*"]
 }

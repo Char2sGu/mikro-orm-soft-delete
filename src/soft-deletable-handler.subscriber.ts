@@ -33,7 +33,7 @@ export class SoftDeletableHandlerSubscriber implements EventSubscriber {
           const { field, value } = metadata;
           item.type = ChangeSetType.UPDATE;
           item.entity[field] = value();
-          // @ts-expect-error
+          // @ts-expect-error I couldn't get the typings to work here (yet)
           item.payload[field] = value();
 
           // Don't recompute here. Otherwise ManyToOne relation fields will be

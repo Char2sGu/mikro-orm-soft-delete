@@ -7,10 +7,10 @@
     "test": "jest",
     "prebuild": "rimraf lib",
     "build": "tsc -b tsconfig.build.json",
-    "format": "prettier --write \"src/**/*.ts\" \"*.js\" \"*.json\"",
-    "format:diff": "prettier --list-different \"src/**/*.ts\"",
-    "lint": "eslint --cache \"src/**/*.ts\"",
-    "lint:fix": "eslint --cache --fix \"src/**/*.ts\""
+    "format": "prettier --write \"**/*.ts\" \"*.js\" \"*.json\"",
+    "format:diff": "prettier --list-different \"**/*.ts\"",
+    "lint": "eslint --cache \"**/*.ts\"",
+    "lint:fix": "eslint --cache --fix \"**/*.ts\""
   },
   "repository": {
     "type": "git",
@@ -32,6 +32,7 @@
   "homepage": "https://github.com/TheNightmareX/mikro-orm-soft-delete#readme",
   "devDependencies": {
     "@mikro-orm/core": "^5.9.3",
+    "@mikro-orm/sqlite": "^5.9.3",
     "@types/jest": "^29.5.8",
     "@typescript-eslint/eslint-plugin": "^6.11.0",
     "@typescript-eslint/parser": "^6.11.0",
