@@ -64,7 +64,3 @@ Currently it's impossible to perform perfect hard deletes. As a workaround, we c
 ```ts
 em.nativeDelete(...);
 ```
-
-## Known Issues
-
-- [Deleted entities can appear in the query result in some cases](https://github.com/mikro-orm/mikro-orm/issues/2440)
