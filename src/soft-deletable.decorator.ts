@@ -20,6 +20,7 @@ export const SoftDeletable =
     type: () => Type<Entity>,
     field: Field,
     value: () => Entity[Field],
+    fieldValue: any = null
   ) =>
   (type: Type<Entity>): void => {
     const metadata: SoftDeletableMetadata<Entity, Field> = { field, value };
@@ -27,7 +28,7 @@ export const SoftDeletable =
 
     Filter<Entity>({
       name: SOFT_DELETABLE_FILTER,
-      cond: { [field]: null } as FilterQuery<Entity>,
+      cond: { [field]: fieldValue } as FilterQuery<Entity>,
       default: true,
     })(type);
   };
