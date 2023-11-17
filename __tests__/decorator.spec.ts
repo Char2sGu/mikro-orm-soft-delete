@@ -9,14 +9,24 @@ import { MikroORM } from "@mikro-orm/sqlite";
 
 import { SoftDeletable } from "../src";
 
-@SoftDeletable(() => User, "deletedAt", () => new Date())
+@SoftDeletable(() => UserDeletedAt, "deletedAt", () => new Date())
 @Entity()
-class User extends BaseEntity<User, "id"> {
+class UserDeletedAt extends BaseEntity<UserDeletedAt, "id"> {
   @PrimaryKey()
   id!: number;
 
   @Property({ nullable: true })
   deletedAt?: Date;
+}
+
+@SoftDeletable(() => UserIsDeleted, "isDeleted", () => true, false)
+@Entity()
+class UserIsDeleted extends BaseEntity<UserDeletedAt, "id"> {
+  @PrimaryKey()
+  id!: number;
+
+  @Property()
+  isDeleted!: boolean;
 }
 
 describe("decorator", () => {
@@ -26,7 +36,7 @@ describe("decorator", () => {
     orm = await MikroORM.init({
       type: "sqlite",
       dbName: ":memory:",
-      entities: [User],
+      entities: [UserDeletedAt, UserIsDeleted],
       loggerFactory: (options) => new SimpleLogger(options),
       // debug: true,
       allowGlobalContext: true,
@@ -37,26 +47,43 @@ describe("decorator", () => {
   afterAll(() => orm.close(true));
 
   it("should not fetch soft deleted by default", async () => {
-    orm.em.create(User, { id: 1, deletedAt: new Date() });
+    orm.em.create(UserDeletedAt, { id: 1, deletedAt: new Date() });
     await orm.em.flush();
 
-    const user = await orm.em.findOne(User, 1);
+    const user = await orm.em.findOne(UserDeletedAt, 1);
 
     expect(user).toEqual(null);
   });
 
   it("should transform hard delete in soft delete", async () => {
-    orm.em.create(User, { id: 2 });
+    orm.em.create(UserDeletedAt, { id: 2 });
     await orm.em.flush();
 
-    const user = await orm.em.findOneOrFail(User, 2);
+    const user = await orm.em.findOneOrFail(UserDeletedAt, 2);
     orm.em.remove(user);
     await orm.em.flush();
 
-    const userSoftDeleted = await orm.em.findOneOrFail(User, 2, {
+    const userSoftDeleted = await orm.em.findOneOrFail(UserDeletedAt, 2, {
       filters: false,
     });
 
     expect(userSoftDeleted.deletedAt).toBeInstanceOf(Date);
+  });
+
+  it("should support custom fieldValue for the filter", async () => {
+    orm.em.create(UserIsDeleted, { id: 1, isDeleted: false });
+    await orm.em.flush();
+
+    const user = await orm.em.findOneOrFail(UserIsDeleted, 1);
+    orm.em.remove(user);
+    await orm.em.flush();
+
+    await expect(orm.em.findOne(UserIsDeleted, 1)).resolves.toEqual(null);
+
+    const userSoftDeleted = await orm.em.findOneOrFail(UserIsDeleted, 1, {
+      filters: false,
+    });
+
+    expect(userSoftDeleted.isDeleted).toEqual(true);
   });
 });
