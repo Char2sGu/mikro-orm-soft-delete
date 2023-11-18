@@ -1,6 +1,7 @@
 import {
   BaseEntity,
   Entity,
+  EntityClass,
   PrimaryKey,
   Property,
   SimpleLogger,
@@ -32,45 +33,57 @@ class UserIsDeleted extends BaseEntity<UserDeletedAt, "id"> {
 describe("decorator", () => {
   let orm: MikroORM;
 
-  beforeAll(async () => {
+  async function init(entities: EntityClass<any>[]) {
     orm = await MikroORM.init({
       type: "sqlite",
       dbName: ":memory:",
-      entities: [UserDeletedAt, UserIsDeleted],
+      entities: entities,
       loggerFactory: (options) => new SimpleLogger(options),
       // debug: true,
       allowGlobalContext: true,
     });
     await orm.schema.createSchema();
-  });
+  }
 
-  afterAll(() => orm.close(true));
+  async function cleanup() {
+    await orm.close(true);
+  }
 
   test("query result should not include soft-deleted entities", async () => {
+    await init([UserDeletedAt]);
+
     orm.em.create(UserDeletedAt, { id: 1, deletedAt: new Date() });
     await orm.em.flush();
 
     const user = await orm.em.findOne(UserDeletedAt, 1);
 
     expect(user).toEqual(null);
+
+    await cleanup();
   });
 
   test("deletion operations should be intercepted and transformed", async () => {
-    orm.em.create(UserDeletedAt, { id: 2 });
+    await init([UserDeletedAt]);
+
+    orm.em.create(UserDeletedAt, { id: 1 });
     await orm.em.flush();
 
-    const user = await orm.em.findOneOrFail(UserDeletedAt, 2);
+    const user = await orm.em.findOneOrFail(UserDeletedAt, 1);
     orm.em.remove(user);
     await orm.em.flush();
 
-    const userSoftDeleted = await orm.em.findOneOrFail(UserDeletedAt, 2, {
+    const userSoftDeleted = await orm.em.findOneOrFail(UserDeletedAt, 1, {
       filters: false,
     });
 
     expect(userSoftDeleted.deletedAt).toBeInstanceOf(Date);
+
+    await cleanup();
   });
 
   test("`valueInitial` settings should be respected", async () => {
+    await init([UserIsDeleted]);
+
     orm.em.create(UserIsDeleted, { id: 1, isDeleted: false });
     await orm.em.flush();
 
@@ -85,5 +98,7 @@ describe("decorator", () => {
     });
 
     expect(userSoftDeleted.isDeleted).toEqual(true);
+
+    await cleanup();
   });
 });
