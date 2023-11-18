@@ -30,6 +30,21 @@ class UserIsDeleted extends BaseEntity<UserDeletedAt, "id"> {
   isDeleted!: boolean;
 }
 
+@SoftDeletable({
+  type: () => UserIsDeleted,
+  field: "isDeleted",
+  value: () => true,
+  valueInitial: false,
+})
+@Entity()
+class UserIsDeletedAlt extends BaseEntity<UserDeletedAt, "id"> {
+  @PrimaryKey()
+  id!: number;
+
+  @Property()
+  isDeleted!: boolean;
+}
+
 describe("decorator", () => {
   let orm: MikroORM;
 
@@ -98,6 +113,25 @@ describe("decorator", () => {
     });
 
     expect(userSoftDeleted.isDeleted).toEqual(true);
+
+    await cleanup();
+  });
+
+  test("the object-based syntax should work", async () => {
+    await init([UserIsDeletedAlt]);
+
+    orm.em.create(UserIsDeletedAlt, { id: 1, isDeleted: false });
+    await orm.em.flush();
+    const user = await orm.em.findOneOrFail(UserIsDeletedAlt, 1);
+    await orm.em.removeAndFlush(user);
+
+    await expect(orm.em.findOne(UserIsDeletedAlt, 1)).resolves.toBe(null);
+
+    await expect(
+      orm.em.findOne(UserIsDeletedAlt, 1, {
+        filters: false,
+      }),
+    ).resolves.toBeDefined();
 
     await cleanup();
   });
