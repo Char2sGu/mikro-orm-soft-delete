@@ -16,27 +16,61 @@ import { SoftDeletableMetadata } from "./soft-deletable-metadata.interface";
  * @returns
  * @see SoftDeletableHandlerSubscriber
  */
-export const SoftDeletable =
-  <Entity, Field extends keyof Entity>(
-    type: () => Type<Entity>,
-    field: Field,
-    value: () => Entity[Field],
-    fieldValue?: Entity[Field],
-  ) =>
-  (type: Type<Entity>): void => {
+export function SoftDeletable<Entity, Field extends keyof Entity>(
+  config: SoftDeletableConfig<Entity, Field>,
+): EntityDecorator<Entity>;
+export function SoftDeletable<Entity, Field extends keyof Entity>(
+  type: () => Type<Entity>,
+  field: Field,
+  value: () => Entity[Field],
+  fieldValue?: Entity[Field],
+): EntityDecorator<Entity>;
+export function SoftDeletable<Entity, Field extends keyof Entity>(
+  _configOrType: SoftDeletableConfig<Entity, Field> | (() => Type<Entity>),
+  _field?: Field,
+  _value?: () => Entity[Field],
+  _fieldValue?: Entity[Field],
+): EntityDecorator<Entity> {
+  const config =
+    typeof _configOrType === "function"
+      ? _field && _value
+        ? {
+            type: _configOrType,
+            field: _field,
+            value: _value,
+            fieldValue: _fieldValue,
+          }
+        : null
+      : _configOrType;
+  if (!config) throw new Error("Invalid arguments");
+
+  const { field, value, fieldValue } = config;
+
+  return (type: Type<Entity>): void => {
     const metadata: SoftDeletableMetadata<Entity, Field> = { field, value };
     Reflect.defineMetadata(SOFT_DELETABLE, metadata, type);
-
     Filter<Entity>({
       name: SOFT_DELETABLE_FILTER,
       cond: { [field]: fieldValue ?? null } as FilterQuery<Entity>,
       default: true,
     })(type);
   };
+}
+
+export interface SoftDeletableConfig<Entity, Field extends keyof Entity> {
+  type: () => Type<Entity>;
+  field: Field;
+  value: () => Entity[Field];
+  fieldValue?: Entity[Field];
+}
 
 interface Type<T> {
   new (...args: any[]): T;
   prototype: T;
+}
+
+interface EntityDecorator<Entity> {
+  (type: Type<Entity>): void;
 }
 
 SoftDeletableHandlerSubscriber;
