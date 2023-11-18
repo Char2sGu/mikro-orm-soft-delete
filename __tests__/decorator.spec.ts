@@ -46,7 +46,7 @@ describe("decorator", () => {
 
   afterAll(() => orm.close(true));
 
-  it("should not fetch soft deleted by default", async () => {
+  test("query result should not include soft-deleted entities", async () => {
     orm.em.create(UserDeletedAt, { id: 1, deletedAt: new Date() });
     await orm.em.flush();
 
@@ -55,7 +55,7 @@ describe("decorator", () => {
     expect(user).toEqual(null);
   });
 
-  it("should transform hard delete in soft delete", async () => {
+  test("deletion operations should be intercepted and transformed", async () => {
     orm.em.create(UserDeletedAt, { id: 2 });
     await orm.em.flush();
 
@@ -70,7 +70,7 @@ describe("decorator", () => {
     expect(userSoftDeleted.deletedAt).toBeInstanceOf(Date);
   });
 
-  it("should support custom fieldValue for the filter", async () => {
+  test("`valueInitial` settings should be respected", async () => {
     orm.em.create(UserIsDeleted, { id: 1, isDeleted: false });
     await orm.em.flush();
 
