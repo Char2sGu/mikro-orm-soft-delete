@@ -9,16 +9,19 @@ import { SoftDeletableMetadata } from "./soft-deletable-metadata.interface";
 
 /**
  * Mark an entity type as soft-deletable.
- * @param type - Helper function for type inference.
- * @param field - Identifier field used to identify deleted entities.
- * @param value - Value to set to the identifier field in deletions.
- * @param valueInitial - Value to identify entities that is not soft-deleted. Defaults to `null`.
- * @returns
  * @see SoftDeletableHandlerSubscriber
  */
 export function SoftDeletable<Entity, Field extends keyof Entity>(
   config: SoftDeletableConfig<Entity, Field>,
 ): EntityDecorator<Entity>;
+/**
+ * Mark an entity type as soft-deletable.
+ * @param type - Helper function for type inference.
+ * @param field - Identifier field used to identify deleted entities.
+ * @param value - Value to set to the identifier field in deletions.
+ * @param valueInitial - Value to identify entities that is NOT soft-deleted. Defaults to `null`.
+ * @see SoftDeletableHandlerSubscriber
+ */
 export function SoftDeletable<Entity, Field extends keyof Entity>(
   type: () => Type<Entity>,
   field: Field,
@@ -58,9 +61,13 @@ export function SoftDeletable<Entity, Field extends keyof Entity>(
 }
 
 export interface SoftDeletableConfig<Entity, Field extends keyof Entity> {
+  /**Helper function for type inference. */
   type: () => Type<Entity>;
+  /**Identifier field used to identify deleted entities. */
   field: Field;
+  /**Value to set to the identifier field in deletions. */
   value: () => Entity[Field];
+  /**Value to identify entities that is NOT soft-deleted. Defaults to `null`. */
   valueInitial?: Entity[Field];
 }
 
