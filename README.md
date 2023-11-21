@@ -42,6 +42,43 @@ This means that:
   ```
 - `cascade: [Cascade.Remove]` and `orphanRemoval: true` still work fine with `repo.remove()`. But you must avoid removing items from collections when using `orphanRemoval` because we cannot catch the deletions caused by it.
 
+### Object-based API
+
+Aside from passing the parameters by position, there is also an object-based API that allows you to pass in an config object:
+
+```ts
+@SoftDeletable({
+  type: () => User,
+  field: 'deletedAt',
+  value: () => new Date(),
+})
+```
+
+### `valueInitial` Option
+
+By default, a `null` value is used in the query to exclude deleted objects: `{ deletedAt: null }`. However, if the default value of the field is not `null`, the query would not work as we expected.
+
+For example, when the field is `isDeleted` and the default value is `false`, the query `{ isDeleted: null }` would not match any entities.
+
+In this case, an additional option `valueInitial` can be provided:
+
+```ts
+@SoftDeletable({
+  type: () => User,
+  field: 'isDeleted',
+  value: () => true,
+  valueInitial: false,
+})
+```
+
+...which would make the query look like `{ isDeleted: false }` to find all the entities that is not soft-deleted.
+
+When not using the object-based API, this option can be also provided as the 4th argument:
+
+```ts
+@SoftDeletable(() => User, 'isDeleted', () => true, false)
+```
+
 ### Inheritance
 
 If you want all your entities to be soft deletable, you can create a `SoftDeletableBaseEntity` and make all your other entity classes extend it:
