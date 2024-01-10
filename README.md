@@ -10,14 +10,28 @@ npm i mikro-orm-soft-delete
 
 ## Tutorial
 
+### Registering the extension
+
+In your mikro-orm config, register the `SoftDelete` as a [MikroORM extension](https://mikro-orm.io/docs/configuration#extensions):
+
+```ts
+import { SoftDeletable } from "mikro-orm-soft-delete";
+
+await MikroORM.init({
+  // Your config...
+  extensions: [SoftDeletable],
+  // Other config values...
+});
+```
+
 ### Basic
 
-It is so simple to enable soft delete with this package that you only need one example to understand what's going on:
+After registering the extension, it is so simple to enable soft delete with this package that you only need one example to understand what's going on:
 
 ```ts
 @SoftDeletable(() => User, "deletedAt", () => new Date())
 @Entity()
-export class User extends BaseEntity<User, "id"> {
+export class User extends BaseEntity {
   @PrimaryKey()
   id: number;
 
@@ -85,10 +99,7 @@ If you want all your entities to be soft deletable, you can create a `SoftDeleta
 
 ```ts
 @SoftDeletable(() => SoftDeletableBaseEntity, "deletedAt", () => new Date())
-export abstract class SoftDeletableBaseEntity<
-  T,
-  PK extends keyof T,
-> extends BaseEntity<T, PK> {
+export abstract class SoftDeletableBaseEntity extends BaseEntity {
   @Property({ nullable: true })
   deletedAt?: Date;
 }

@@ -1,6 +1,6 @@
 import "./soft-deletable-handler.subscriber";
 
-import { Filter, FilterQuery } from "@mikro-orm/core";
+import { Filter, FilterQuery, type MikroORM } from "@mikro-orm/core";
 
 import { SOFT_DELETABLE } from "./soft-deletable.symbol";
 import { SOFT_DELETABLE_FILTER } from "./soft-deletable-filter.constant";
@@ -60,14 +60,34 @@ export function SoftDeletable<Entity, Field extends keyof Entity>(
   };
 }
 
+/**
+ * Transform SoftDeletable into an extension that can be registered to MikroORM.
+ */
+SoftDeletable.register = (orm: MikroORM): void => {
+  orm.em
+    .getEventManager()
+    .registerSubscriber(new SoftDeletableHandlerSubscriber());
+};
+
 export interface SoftDeletableConfig<Entity, Field extends keyof Entity> {
-  /**Helper function for type inference. */
+  /**
+   * Helper function for type inference.
+   */
   type: () => Type<Entity>;
-  /**Identifier field used to identify deleted entities. */
+
+  /**
+   * Identifier field used to identify deleted entities.
+   */
   field: Field;
-  /**Value to set to the identifier field in deletions. */
+
+  /**
+   * Value to set to the identifier field in deletions.
+   */
   value: () => Entity[Field];
-  /**Value to identify entities that is NOT soft-deleted. Defaults to `null`. */
+
+  /**
+   * Value to identify entities that is NOT soft-deleted. Defaults to `null`.
+   */
   valueInitial?: Entity[Field];
 }
 
@@ -76,8 +96,4 @@ interface Type<T> {
   prototype: T;
 }
 
-interface EntityDecorator<Entity> {
-  (type: Type<Entity>): void;
-}
-
-SoftDeletableHandlerSubscriber;
+type EntityDecorator<Entity> = (type: Type<Entity>) => void;
