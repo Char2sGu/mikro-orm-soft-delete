@@ -13,8 +13,7 @@
     "skipLibCheck": true,
     "experimentalDecorators": true,
     "forceConsistentCasingInFileNames": true,
-    "emitDecoratorMetadata": true,
-    "importHelpers": true
+    "emitDecoratorMetadata": true
   },
   "exclude": ["node_modules", "**/node_modules/*"]
 }

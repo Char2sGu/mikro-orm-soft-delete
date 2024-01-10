@@ -12,7 +12,7 @@ import { SoftDeletable } from "../src";
 
 @SoftDeletable(() => UserDeletedAt, "deletedAt", () => new Date())
 @Entity()
-class UserDeletedAt extends BaseEntity<UserDeletedAt, "id"> {
+class UserDeletedAt extends BaseEntity {
   @PrimaryKey()
   id!: number;
 
@@ -22,7 +22,7 @@ class UserDeletedAt extends BaseEntity<UserDeletedAt, "id"> {
 
 @SoftDeletable(() => UserIsDeleted, "isDeleted", () => true, false)
 @Entity()
-class UserIsDeleted extends BaseEntity<UserDeletedAt, "id"> {
+class UserIsDeleted extends BaseEntity {
   @PrimaryKey()
   id!: number;
 
@@ -37,7 +37,7 @@ class UserIsDeleted extends BaseEntity<UserDeletedAt, "id"> {
   valueInitial: false,
 })
 @Entity()
-class UserIsDeletedAlt extends BaseEntity<UserDeletedAt, "id"> {
+class UserIsDeletedAlt extends BaseEntity {
   @PrimaryKey()
   id!: number;
 
@@ -50,9 +50,9 @@ describe("decorator", () => {
 
   async function init(entities: EntityClass<any>[]) {
     orm = await MikroORM.init({
-      type: "sqlite",
       dbName: ":memory:",
-      entities: entities,
+      entities,
+      extensions: [SoftDeletable],
       loggerFactory: (options) => new SimpleLogger(options),
       // debug: true,
       allowGlobalContext: true,
