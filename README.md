@@ -1,6 +1,6 @@
 # Mikro ORM Soft Delete
 
-Generic soft delete solution for MikroORM.
+The declarative soft-delete solution for MikroORM.
 
 ```
 npm i mikro-orm-soft-delete
@@ -10,25 +10,27 @@ npm i mikro-orm-soft-delete
 
 ## Tutorial
 
-### Registering the extension
+### Initialization
 
-In your mikro-orm config, register the `SoftDelete` as a [MikroORM extension](https://mikro-orm.io/docs/configuration#extensions):
+To enable soft-delete for your `MikroORM` instance, register `SoftDeleteHandler` as an [extension](https://mikro-orm.io/docs/configuration#extensions) in the initialization config:
+
+```ts
+import { SoftDeleteHandler } from "mikro-orm-soft-delete";
+
+await MikroORM.init({
+  // ...
+  extensions: [SoftDeleteHandler],
+  // ...
+});
+```
+
+### Basics
+
+Put a `SoftDeletable` decorator on your entity definition to make it soft-deletable:
 
 ```ts
 import { SoftDeletable } from "mikro-orm-soft-delete";
 
-await MikroORM.init({
-  // Your config...
-  extensions: [SoftDeletable],
-  // Other config values...
-});
-```
-
-### Basic
-
-After registering the extension, it is so simple to enable soft delete with this package that you only need one example to understand what's going on:
-
-```ts
 @SoftDeletable(() => User, "deletedAt", () => new Date())
 @Entity()
 export class User extends BaseEntity {
@@ -40,25 +42,26 @@ export class User extends BaseEntity {
 }
 ```
 
-This means that:
+The above code snippet means that:
 
-- A filter with conditions `{ deletedAt: null }` has been defined on `User` and enabled by default, so that those deleted entities will be filtered out by default. The filter can be disabled by:
+- A filter with conditions `{ deletedAt: null }` is applied to `User` and enabled by default, so that those soft-deleted entities will be excluded from your queries. This filter could be disabled by:
   ```ts
+  import { SOFT_DELETABLE_FILTER } from "mikro-orm-soft-delete";
   repo.find({ ... }, { filters: { [SOFT_DELETABLE_FILTER]: false } });
   repo.find({ ... }, { filters: false }); // if you are sure that there are no other filters enabled
   ```
-- When you try to delete a `User` entity, it will not be actually deleted from the database, and its `deletedAt` property will be set to a newly instantiated `Date`. You can find that `delete` statements are replaced with `update` ones with MikroORM's debug mode on.
+- When an deletion command is executed on a `User` entity, its `deletedAt` field will be set to a newly instantiated `Date`. You could find all `delete` statements replaced with `update` ones under MikroORM's debugging mode:
   ```ts
   repo.remove(user);
   await repo.flush();
   user.id !== undefined; // true
-  user.deletedAt === true; // true
+  user.deletedAt instanceof Date; // true
   ```
-- `cascade: [Cascade.Remove]` and `orphanRemoval: true` still work fine with `repo.remove()`. But you must avoid removing items from collections when using `orphanRemoval` because we cannot catch the deletions caused by it.
+- `cascade: [Cascade.Remove]` and `orphanRemoval: true` still work with `repo.remove()`. But you would have to avoid removing items from collections when using `orphanRemoval` as it's currently not possible to intercept deletions caused by these operations.
 
-### Object-based API
+### Config API
 
-Aside from passing the parameters by position, there is also an object-based API that allows you to pass in an config object:
+Aside from passing the parameters by positions, there is also an object-based API that accepts a config object instead:
 
 ```ts
 @SoftDeletable({
@@ -68,26 +71,26 @@ Aside from passing the parameters by position, there is also an object-based API
 })
 ```
 
-### `valueInitial` Option
+### Default Field Value
 
-By default, a `null` value is used in the query to exclude deleted objects: `{ deletedAt: null }`. However, if the default value of the field is not `null`, the query would not work as we expected.
+By default, a `null` value is used in the filter to exclude soft-deleted entities: `{ deletedAt: null }`. However, if the default value of the field is not `null`, the query would not work as we expected.
 
 For example, when the field is `isDeleted` and the default value is `false`, the query `{ isDeleted: null }` would not match any entities.
 
-In this case, an additional option `valueInitial` can be provided:
+In this case, an additional option `valueInitial` needs to be specified:
 
 ```ts
 @SoftDeletable({
   type: () => User,
   field: 'isDeleted',
   value: () => true,
-  valueInitial: false,
+  valueInitial: false, // indicating that the default value of `isDeleted` is `false`.
 })
 ```
 
 ...which would make the query look like `{ isDeleted: false }` to find all the entities that is not soft-deleted.
 
-When not using the object-based API, this option can be also provided as the 4th argument:
+This option could also be specified through the 4th argument:
 
 ```ts
 @SoftDeletable(() => User, 'isDeleted', () => true, false)
@@ -95,7 +98,7 @@ When not using the object-based API, this option can be also provided as the 4th
 
 ### Inheritance
 
-If you want all your entities to be soft deletable, you can create a `SoftDeletableBaseEntity` and make all your other entity classes extend it:
+Inheritance is supported for the `SoftDeletable` decorator, thus it is possible to create a `SoftDeletableBaseEntity` to make all the sub entity classes soft-deletable:
 
 ```ts
 @SoftDeletable(() => SoftDeletableBaseEntity, "deletedAt", () => new Date())
@@ -105,9 +108,9 @@ export abstract class SoftDeletableBaseEntity extends BaseEntity {
 }
 ```
 
-### Hard Deleting
+### Hard Deletions
 
-Currently it's impossible to perform perfect hard deletes. As a workaround, we can hard delete entities using the native API:
+Currently it's impossible to hard-delete an entity marked as soft-deletable. As a workaround, the native API could be used for hard-deletions:
 
 ```ts
 em.nativeDelete(...);

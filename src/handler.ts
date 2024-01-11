@@ -3,10 +3,10 @@ import {
   ChangeSetType,
   EventSubscriber,
   FlushEventArgs,
+  MikroORM,
 } from "@mikro-orm/core";
 
-import { SOFT_DELETABLE } from "./soft-deletable.symbol";
-import { SoftDeletableMetadata } from "./soft-deletable-metadata.interface";
+import { SOFT_DELETABLE, SoftDeletableConfig } from "./common";
 
 /**
  * Intercept deletions of soft-deletable entities and perform updates instead.
@@ -14,7 +14,11 @@ import { SoftDeletableMetadata } from "./soft-deletable-metadata.interface";
  * @see SoftDeletable
  * @see https://github.com/mikro-orm/mikro-orm/issues/1492#issuecomment-785394397
  */
-export class SoftDeletableHandlerSubscriber implements EventSubscriber {
+export class SoftDeleteHandler implements EventSubscriber {
+  static register(orm: MikroORM): void {
+    orm.em.getEventManager().registerSubscriber(new this());
+  }
+
   async onFlush({ uow }: FlushEventArgs): Promise<void> {
     uow
       .getChangeSets()
@@ -26,7 +30,7 @@ export class SoftDeletableHandlerSubscriber implements EventSubscriber {
             item.type === ChangeSetType.DELETE &&
             Reflect.hasMetadata(SOFT_DELETABLE, item.entity.constructor)
           ) {
-            const { field, value }: SoftDeletableMetadata<Entity, Field> =
+            const { field, value }: SoftDeletableConfig<Entity, Field> =
               Reflect.getMetadata(SOFT_DELETABLE, item.entity.constructor);
 
             item.type = ChangeSetType.UPDATE;
