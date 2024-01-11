@@ -3,6 +3,7 @@
   "version": "1.0.0-alpha.0",
   "description": "",
   "main": "lib/index.js",
+  "packageManager": "npm@10.2.3",
   "scripts": {
     "test": "jest --detectOpenHandles",
     "prebuild": "rimraf lib",
