@@ -8,7 +8,7 @@ import {
 } from "@mikro-orm/core";
 import { MikroORM } from "@mikro-orm/sqlite";
 
-import { SoftDeletable } from "../src";
+import { SoftDeletable, SoftDeleteHandler } from "../src";
 
 @SoftDeletable(() => UserDeletedAt, "deletedAt", () => new Date())
 @Entity()
@@ -52,7 +52,7 @@ describe("decorator", () => {
     orm = await MikroORM.init({
       dbName: ":memory:",
       entities,
-      extensions: [SoftDeletable],
+      extensions: [SoftDeleteHandler],
       loggerFactory: (options) => new SimpleLogger(options),
       // debug: true,
       allowGlobalContext: true,
