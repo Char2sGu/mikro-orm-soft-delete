@@ -8,6 +8,18 @@ npm i mikro-orm-soft-delete
 
 > Inspired by: https://github.com/mikro-orm/mikro-orm/issues/1492#issuecomment-785394397
 
+## Compatibilities
+
+| Library Version | ORM Version |
+| --------------- | ----------- |
+| v1.x.x          | v6.x.x      |
+| v0.x.x          | v5.x.x      |
+
+## Migrating to v1
+
+- It is now mandatory to register `SoftDeleteHandler` as an extension for this library to work. See [Initialization](#initialization) for details.
+- Base entities no longer accept any generic type parameters.
+
 ## Tutorial
 
 ### Initialization
