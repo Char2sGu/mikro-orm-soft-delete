@@ -8,10 +8,7 @@ import {
   SoftDeletableConfig,
 } from "./common";
 
-interface Type<T> {
-  new (...args: any[]): T;
-  prototype: T;
-}
+type Type<Entity> = abstract new (...args: any[]) => Entity;
 
 type EntityDecorator<Entity> = (type: Type<Entity>) => void;
 

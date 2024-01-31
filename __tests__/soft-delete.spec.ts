@@ -20,15 +20,22 @@ class UserDeletedAt extends BaseEntity {
   deletedAt?: Date;
 }
 
-@SoftDeletable(() => UserIsDeleted, "isDeleted", () => true, false)
+@SoftDeletable(() => SoftDeletableBaseEntity, "isDeleted", () => true, false)
 @Entity()
-class UserIsDeleted extends BaseEntity {
+abstract class SoftDeletableBaseEntity extends BaseEntity {
+  constructor(_a: string) {
+    super();
+  }
+
   @PrimaryKey()
   id!: number;
 
   @Property()
   isDeleted!: boolean;
 }
+
+@Entity()
+class UserIsDeleted extends SoftDeletableBaseEntity {}
 
 @SoftDeletable({
   type: () => UserIsDeleted,
