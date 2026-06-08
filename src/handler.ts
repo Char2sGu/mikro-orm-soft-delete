@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import {
   ChangeSet,
   ChangeSetType,
@@ -6,7 +8,7 @@ import {
   MikroORM,
 } from "@mikro-orm/core";
 
-import { SOFT_DELETABLE, SoftDeletableConfig } from "./common";
+import { SOFT_DELETABLE, SoftDeletableConfig } from "./common.js";
 
 /**
  * Intercept deletions of soft-deletable entities and perform updates instead.

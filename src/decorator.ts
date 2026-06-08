@@ -1,12 +1,14 @@
-import "./handler";
+import "reflect-metadata";
+import "./handler.js";
 
-import { Filter, FilterQuery } from "@mikro-orm/core";
+import { EntityClass, FilterQuery } from "@mikro-orm/core";
+import { Filter } from "@mikro-orm/decorators/legacy";
 
 import {
   SOFT_DELETABLE,
   SOFT_DELETABLE_FILTER,
   SoftDeletableConfig,
-} from "./common";
+} from "./common.js";
 
 type Type<Entity> = abstract new (...args: any[]) => Entity;
 
@@ -64,10 +66,10 @@ export function SoftDeletable<Entity, Field extends keyof Entity>(
   return (type: Type<Entity>): void => {
     Reflect.defineMetadata(SOFT_DELETABLE, config, type);
     const { field, valueInitial } = config;
-    Filter<Entity>({
+    Filter<EntityClass<Entity>>({
       name: SOFT_DELETABLE_FILTER,
       cond: { [field]: valueInitial ?? null } as FilterQuery<Entity>,
       default: true,
-    })(type);
+    })(type as EntityClass<Entity>);
   };
 }
