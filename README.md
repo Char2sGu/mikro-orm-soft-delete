@@ -12,8 +12,15 @@ npm i mikro-orm-soft-delete
 
 | Library Version | ORM Version |
 | --------------- | ----------- |
+| v2.x.x          | v7.x.x      |
 | v1.x.x          | v6.x.x      |
 | v0.x.x          | v5.x.x      |
+
+## Migrating to v2
+
+- Targets MikroORM v7, which is ESM-only. This package is now ESM-only as well.
+- `SoftDeleteHandler` is now registered as a [subscriber](https://mikro-orm.io/docs/configuration#subscribers) instead of an extension. See [Initialization](#initialization) for details.
+- MikroORM v7 no longer enables `ReflectMetadataProvider` by default. If you use the decorator-based entity definitions, configure it explicitly (see below).
 
 ## Migrating to v1
 
@@ -24,14 +31,14 @@ npm i mikro-orm-soft-delete
 
 ### Initialization
 
-To enable soft-delete for your `MikroORM` instance, register `SoftDeleteHandler` as an [extension](https://mikro-orm.io/docs/configuration#extensions) in the initialization config:
+To enable soft-delete for your `MikroORM` instance, register `SoftDeleteHandler` as a [subscriber](https://mikro-orm.io/docs/configuration#subscribers) in the initialization config:
 
 ```ts
 import { SoftDeleteHandler } from "mikro-orm-soft-delete";
 
 await MikroORM.init({
   // ...
-  extensions: [SoftDeleteHandler],
+  subscribers: [SoftDeleteHandler],
   // ...
 });
 ```

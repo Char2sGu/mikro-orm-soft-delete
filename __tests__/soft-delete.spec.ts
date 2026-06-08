@@ -1,14 +1,13 @@
+import { BaseEntity, EntityClass, SimpleLogger } from "@mikro-orm/core";
 import {
-  BaseEntity,
   Entity,
-  EntityClass,
   PrimaryKey,
   Property,
-  SimpleLogger,
-} from "@mikro-orm/core";
+  ReflectMetadataProvider,
+} from "@mikro-orm/decorators/legacy";
 import { MikroORM } from "@mikro-orm/sqlite";
 
-import { SoftDeletable, SoftDeleteHandler } from "../src";
+import { SoftDeletable, SoftDeleteHandler } from "../src/index.js";
 
 @SoftDeletable(() => UserDeletedAt, "deletedAt", () => new Date())
 @Entity()
@@ -59,12 +58,13 @@ describe("decorator", () => {
     orm = await MikroORM.init({
       dbName: ":memory:",
       entities,
-      extensions: [SoftDeleteHandler],
+      metadataProvider: ReflectMetadataProvider,
+      subscribers: [SoftDeleteHandler],
       loggerFactory: (options) => new SimpleLogger(options),
       // debug: true,
       allowGlobalContext: true,
     });
-    await orm.schema.createSchema();
+    await orm.schema.create();
   }
 
   async function cleanup() {
@@ -76,6 +76,7 @@ describe("decorator", () => {
 
     orm.em.create(UserDeletedAt, { id: 1, deletedAt: new Date() });
     await orm.em.flush();
+    orm.em.clear();
 
     const user = await orm.em.findOne(UserDeletedAt, 1);
 
@@ -112,6 +113,7 @@ describe("decorator", () => {
     const user = await orm.em.findOneOrFail(UserIsDeleted, 1);
     orm.em.remove(user);
     await orm.em.flush();
+    orm.em.clear();
 
     await expect(orm.em.findOne(UserIsDeleted, 1)).resolves.toEqual(null);
 
@@ -130,7 +132,9 @@ describe("decorator", () => {
     orm.em.create(UserIsDeletedAlt, { id: 1, isDeleted: false });
     await orm.em.flush();
     const user = await orm.em.findOneOrFail(UserIsDeletedAlt, 1);
-    await orm.em.removeAndFlush(user);
+    orm.em.remove(user);
+    await orm.em.flush();
+    orm.em.clear();
 
     await expect(orm.em.findOne(UserIsDeletedAlt, 1)).resolves.toBe(null);
 
