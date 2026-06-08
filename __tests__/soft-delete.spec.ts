@@ -1,3 +1,5 @@
+import "reflect-metadata";
+
 import { BaseEntity, EntityClass, SimpleLogger } from "@mikro-orm/core";
 import {
   Entity,

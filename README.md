@@ -21,6 +21,7 @@ npm i mikro-orm-soft-delete
 - Targets MikroORM v7, which is ESM-only. This package is now ESM-only as well.
 - `SoftDeleteHandler` is now registered as a [subscriber](https://mikro-orm.io/docs/configuration#subscribers) instead of an extension. See [Initialization](#initialization) for details.
 - MikroORM v7 no longer enables `ReflectMetadataProvider` by default. If you use the decorator-based entity definitions, configure it explicitly (see below).
+- `SoftDeletable` no longer depends on `reflect-metadata` and works with both legacy (`experimentalDecorators`) and ES (TC39) decorators. If you use legacy decorators for your entities, you remain responsible for setting up `reflect-metadata` and `ReflectMetadataProvider` yourself, as required by MikroORM.
 
 ## Migrating to v1
 

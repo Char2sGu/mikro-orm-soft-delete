@@ -1,5 +1,3 @@
-import "reflect-metadata";
-
 import {
   ChangeSet,
   ChangeSetType,
@@ -8,7 +6,8 @@ import {
   MikroORM,
 } from "@mikro-orm/core";
 
-import { SOFT_DELETABLE, SoftDeletableConfig } from "./common.js";
+import { SoftDeletableConfig } from "./common.js";
+import { getSoftDeletableConfig } from "./storage.js";
 
 /**
  * Intercept deletions of soft-deletable entities and perform updates instead.
@@ -28,12 +27,11 @@ export class SoftDeleteHandler implements EventSubscriber {
         <Entity extends object, Field extends keyof Entity>(
           item: ChangeSet<Entity>,
         ) => {
-          if (
-            item.type === ChangeSetType.DELETE &&
-            Reflect.hasMetadata(SOFT_DELETABLE, item.entity.constructor)
-          ) {
-            const { field, value }: SoftDeletableConfig<Entity, Field> =
-              Reflect.getMetadata(SOFT_DELETABLE, item.entity.constructor);
+          const config = getSoftDeletableConfig(item.entity.constructor) as
+            | SoftDeletableConfig<Entity, Field>
+            | undefined;
+          if (item.type === ChangeSetType.DELETE && config) {
+            const { field, value } = config;
 
             item.type = ChangeSetType.UPDATE;
             item.entity[field] = value();
