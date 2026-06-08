@@ -1,5 +1,3 @@
-export const SOFT_DELETABLE = Symbol("soft-deletable");
-
 export const SOFT_DELETABLE_FILTER = "soft-deletable-filter";
 
 export interface SoftDeletableConfig<Entity, Field extends keyof Entity> {
