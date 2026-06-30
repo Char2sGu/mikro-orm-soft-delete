@@ -58,7 +58,8 @@
     "README*.md"
   ],
   "peerDependencies": {
-    "@mikro-orm/core": "^7.0.0"
+    "@mikro-orm/core": ">=7.0.0",
+    "@mikro-orm/decorators": ">=7.0.0"
   },
   "engines": {
     "node": ">=18.12.0"
