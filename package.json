@@ -1,6 +1,6 @@
 {
   "name": "mikro-orm-soft-delete",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "",
   "main": "lib/index.js",
   "type": "module",
